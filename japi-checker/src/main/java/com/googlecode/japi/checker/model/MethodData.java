@@ -15,6 +15,7 @@
  */
 package com.googlecode.japi.checker.model;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,93 +24,175 @@ import com.googlecode.japi.checker.ClassDataLoader;
 import com.googlecode.japi.checker.Reporter;
 import com.googlecode.japi.checker.Rule;
 
-public class MethodData extends JavaItem {
+
+public class MethodData
+    extends JavaItem
+{
     private String signature;
     private String descriptor;
     private List<String> exceptions = new ArrayList<String>();
     private int line;
-    
-    public MethodData(ClassDataLoader loader, ClassData owner, int access, String name, String descriptor, String signature, String[] exceptions) {
+
+
+    public MethodData(ClassDataLoader loader,
+                      ClassData owner,
+                      int access,
+                      String name,
+                      String descriptor,
+                      String signature,
+                      String[] exceptions)
+    {
         super(loader, owner, access, name);
         this.setSignature(signature);
         this.setDescriptor(descriptor);
-        if (exceptions != null) {
+        if (exceptions != null)
+        {
             Collections.addAll(this.exceptions, exceptions);
         }
     }
 
-    public void checkBackwardCompatibility(Reporter reporter, MethodData method, List<Rule> rules) {
-    }
 
-    public boolean isSame(MethodData method) {
-        if (method == null) {
+    public void checkBackwardCompatibility(Reporter reporter, MethodData method, List<Rule> rules)
+    {}
+
+
+    public boolean isSame(MethodData method)
+    {
+        if (method == null)
+        {
             return false;
         }
         return this.getName().equals(method.getName()) && this.getDescriptor().equals(method.getDescriptor());
     }
 
+
     /**
      * @return the signature
      */
-    public String getSignature() {
+    public String getSignature()
+    {
         return signature;
     }
+
 
     /**
      * @param signature the signature to set
      */
-    protected void setSignature(String signature) {
+    protected void setSignature(String signature)
+    {
         this.signature = signature;
     }
 
+
     @Override
-    public String getType() {
+    public String getType()
+    {
         return "method";
     }
+
 
     /**
      * @param descriptor the descriptor to set
      */
-    protected void setDescriptor(String descriptor) {
+    protected void setDescriptor(String descriptor)
+    {
         this.descriptor = descriptor;
     }
+
 
     /**
      * @return the descriptor
      */
-    public String getDescriptor() {
+    public String getDescriptor()
+    {
         return descriptor;
     }
+
 
     /**
      * @param exceptions the exceptions to set
      */
-    protected void setExceptions(List<String> exceptions) {
+    protected void setExceptions(List<String> exceptions)
+    {
         this.exceptions = exceptions;
     }
+
 
     /**
      * @return the exceptions
      */
-    public List<String> getExceptions() {
+    public List<String> getExceptions()
+    {
         return exceptions;
     }
 
-    public void setLineNumber(int line) {
+
+    public void setLineNumber(int line)
+    {
         this.line = line;
     }
-    
-    public int getLineNumber() {
+
+
+    public int getLineNumber()
+    {
         return line;
     }
-    
+
+
     /**
-     * Dump method as a string, so it can be used by rules to easily
-     * display it.
-     * {@inheritDoc}
+     * Dump method as a string, so it can be used by rules to easily display it. {@inheritDoc}
      */
     @Override
-    public String toString() {
-    	return getType() + " " + getName() + "(" + getDescriptor() + ")";
+    public String toString()
+    {
+        return getType() + " " + getName() + "(" + getDescriptor() + ")";
     }
+
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((descriptor == null) ? 0 : descriptor.hashCode());
+        result = prime * result + ((exceptions == null) ? 0 : exceptions.hashCode());
+        result = prime * result + ((signature == null) ? 0 : signature.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MethodData other = (MethodData)obj;
+        if (descriptor == null)
+        {
+            if (other.descriptor != null)
+                return false;
+        }
+        else if (!descriptor.equals(other.descriptor))
+            return false;
+        if (exceptions == null)
+        {
+            if (other.exceptions != null)
+                return false;
+        }
+        else if (!exceptions.equals(other.exceptions))
+            return false;
+        if (signature == null)
+        {
+            if (other.signature != null)
+                return false;
+        }
+        else if (!signature.equals(other.signature))
+            return false;
+        return true;
+    }
+
 }

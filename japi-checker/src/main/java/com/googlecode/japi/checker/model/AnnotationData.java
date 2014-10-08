@@ -29,7 +29,7 @@ public class AnnotationData implements Map<String, Object> {
         this.desc = desc;
         this.visible = visible;
     }
-    
+
     /**
      * @return the desc
      */

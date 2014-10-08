@@ -41,19 +41,19 @@ public class ClassData extends JavaItem {
         Collections.addAll(this.interfaces, interfaces);
         this.version = version;
     }
-    
+
     public void add(MethodData method) {
         methods.add(method);
     }
-    
+
     public void add(AttributeData attribute) {
         attributes.add(attribute);
     }
-    
+
     public void add(FieldData field) {
         fields.add(field);
     }
-    
+
     public void checkBackwardCompatibility(Reporter reporter, ClassData clazz, List<Rule> rules) {
         for (FieldData oldField : clazz.fields) {
             for (FieldData newField: this.fields) {
@@ -82,7 +82,7 @@ public class ClassData extends JavaItem {
     public boolean isSame(ClassData newClazz) {
         return this.getName().equals(newClazz.getName());
     }
-    
+
 
     /**
      * @param signature the signature to set
@@ -205,11 +205,17 @@ public class ClassData extends JavaItem {
     public String getSource() {
         return source;
     }
-    
+
     public String getFilename() {
         if (this.getName().lastIndexOf('/') != -1) {
             return this.getName().substring(0, this.getName().lastIndexOf('/') + 1) + getSource();
         }
         return this.getSource();
+    }
+
+
+    public boolean isJAPIWatched()
+    {
+        return getAnnotation("Lcom/googlecode/japi/checker/WatchedByJAPI;") != null;
     }
 }

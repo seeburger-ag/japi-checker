@@ -39,7 +39,7 @@ class ClassDumper extends ClassVisitor {
     private Logger logger = Logger.getLogger(ClassDumper.class.getName());
     private ClassData clazz; // current main class being parsed.
     private Map<String, ClassData> classes = new HashMap<String, ClassData>();
-    
+
     /**
      * Create a new visitor instance.
      * @param loader the ClassDataLoader to which the model are associated.
@@ -48,7 +48,7 @@ class ClassDumper extends ClassVisitor {
         super(Opcodes.ASM4);
         this.loader = loader;
     }
-    
+
     /**
      * {@inheritDoc}
      */

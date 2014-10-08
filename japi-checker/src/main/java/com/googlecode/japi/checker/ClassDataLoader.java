@@ -18,6 +18,7 @@ package com.googlecode.japi.checker;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,7 +39,7 @@ public interface ClassDataLoader {
      * @throws IOException Thrown in case of error.
      */
     void read(URI uri) throws IOException;
-    
+
     /**
      * Get ClassData out of a class name e.g: com.mycompany.mypackage.Class
      * @param name the class name
@@ -46,13 +47,13 @@ public interface ClassDataLoader {
      */
     @Nullable
     ClassData fromName(String name);
-    
+
     /**
      * Get all the ClassData information which belongs to this loader.
      * @return the list of ClassData.
      */
     @Nonnull
-    List<ClassData> getClasses();
+    Map<String, ClassData> getClasses();
 
     /**
      * Get all ClassData from this loaded provided by the given uri.
@@ -60,16 +61,16 @@ public interface ClassDataLoader {
      * @return Returns a list of ClassData.
      */
     @Nonnull
-    List<ClassData> getClasses(@Nonnull URI uri);
-    
+    Map<String, ClassData> getClasses(@Nonnull URI uri);
+
     /**
      * Get all ClassData from this loaded provided by the given uri and filtered using pattern matchers.
-     * @param uri the uri to retrieve ClassData from 
+     * @param uri the uri to retrieve ClassData from
      * @param includes
      * @param excludes
      * @return Returns a list of ClassData.
      */
     @Nonnull
-    List<ClassData> getClasses(@Nonnull URI uri, @Nonnull List<AntPatternMatcher> includes, @Nonnull List<AntPatternMatcher> excludes);
-    
+    Map<String, ClassData> getClasses(@Nonnull URI uri, @Nonnull List<AntPatternMatcher> includes, @Nonnull List<AntPatternMatcher> excludes);
+
 }

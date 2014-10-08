@@ -15,26 +15,29 @@
  */
 package com.googlecode.japi.checker;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import com.googlecode.japi.checker.Severity;
 import com.googlecode.japi.checker.Reporter.Report;
 import com.googlecode.japi.checker.model.ClassData;
+import com.googlecode.japi.checker.rules.AllRules;
+import com.googlecode.japi.checker.rules.CheckMinorVersionIncreaseNeeded;
 import com.googlecode.japi.checker.utils.AntPatternMatcher;
 
+
 /**
- * The class driving the backward compatibility checks.
- * It handles the Rules, Reporter, dependencies and
- *  include/exclude mechanism for the checking.
- *  
+ * The class driving the backward compatibility checks. It handles the Rules, Reporter, dependencies and
+ * include/exclude mechanism for the checking.
+ *
  * @author william.bernardet@gmail.com
- * 
  */
-public class BCChecker {
+public class BCChecker
+{
     private List<File> referenceClasspath = new ArrayList<File>();
     private List<File> newArtifactClasspath = new ArrayList<File>();
     private List<AntPatternMatcher> includes = new ArrayList<AntPatternMatcher>();
@@ -43,163 +46,279 @@ public class BCChecker {
     private boolean warnOnDependencyLoadingError;
     private Reporter reporter;
     private List<Rule> rules = Collections.emptyList();
-    
- 
+    private boolean checkOnlyWatched = false;
+    private boolean isNewMinorVersion = false;
+    private CheckMinorVersionIncreaseNeeded cmvinRule;
+
+
     /**
      * Add a path either a jar or a directory to the reference artifact classpath.
+     *
      * @param path
      */
-    public void addToReferenceClasspath(File path) {
+    public void addToReferenceClasspath(File path)
+    {
         this.referenceClasspath.add(path);
     }
 
+
     /**
      * Add a path either a jar or a directory to the new artifact classpath.
+     *
      * @param path
      */
-    public void addToNewArtifactClasspath(File path) {
+    public void addToNewArtifactClasspath(File path)
+    {
         this.newArtifactClasspath.add(path);
     }
-    
+
+
     /**
-     * Add an include pattern for the class file scanning.
-     * e.g: org/myproject/mypackage/api/&#42;&#42;/&#42;.class
+     * Add an include pattern for the class file scanning. e.g:
+     * org/myproject/mypackage/api/&#42;&#42;/&#42;.class
+     *
      * @param include
      */
-    public void addInclude(String include) {
+    public void addInclude(String include)
+    {
         includes.add(new AntPatternMatcher(include));
     }
 
+
     /**
-     * Add an exclude pattern for the class file scanning.
-     * e.g: org/myproject/mypackage/api/&#42;&#42;/&#42;.class
+     * Add an exclude pattern for the class file scanning. e.g:
+     * org/myproject/mypackage/api/&#42;&#42;/&#42;.class
+     *
      * @param include
      */
-    public void addExclude(String exclude) {
+    public void addExclude(String exclude)
+    {
         excludes.add(new AntPatternMatcher(exclude));
     }
 
+
     /**
      * Defines a custom reporter.
+     *
      * @param reporter
      */
-    public void setReporter(Reporter reporter) {
+    public void setReporter(Reporter reporter)
+    {
         this.reporter = reporter;
     }
 
+
     /**
      * Get the current reporter.
+     *
      * @return
      */
-    public Reporter getReporter() {
+    public Reporter getReporter()
+    {
         return this.reporter;
     }
-    
+
+
     /**
      * Defines the rules to apply during the check.
+     *
      * @param rules
      */
-    public void setRules(List<Rule> rules) {
-        if (rules == null) {
+    public void setRules(List<Rule> rules)
+    {
+        if (rules == null)
+        {
             rules = Collections.emptyList();
         }
         this.rules = rules;
     }
 
+
+    public void setCheckOnlyWatched(boolean arg)
+    {
+        this.checkOnlyWatched = arg;
+    }
+
+
     /**
      * Run the check between the reference and the newArtifact.
+     *
      * @param reference
      * @param newArtifact
      * @throws IOException
      */
-    public void checkBacwardCompatibility(File reference, File newArtifact) throws IOException {
-        if (reference == null) {
+    public void checkBacwardCompatibility(File reference, File newArtifact)
+        throws IOException
+    {
+        if (reference == null)
+        {
             throw new IllegalArgumentException("The reference parameter cannot be null.");
         }
-        if (newArtifact == null) {
+        if (newArtifact == null)
+        {
             throw new IllegalArgumentException("The newArtifact parameter cannot be null.");
         }
-        if (!reference.isDirectory() && !Utils.isArchive(reference)) {
-            throw new IllegalArgumentException("reference must be either a directory" +
-                    " or a jar (or a zip kind of archive) file");
+        if (!reference.isDirectory() && !Utils.isArchive(reference))
+        {
+            throw new IllegalArgumentException("reference must be either a directory"
+                                               + " or a jar (or a zip kind of archive) file");
         }
-        if (!newArtifact.isDirectory() && !Utils.isArchive(newArtifact)) {
-            throw new IllegalArgumentException("new artifact must be either a directory" + 
-                    " or a jar (or a zip kind of archive) file");
+        if (!newArtifact.isDirectory() && !Utils.isArchive(newArtifact))
+        {
+            throw new IllegalArgumentException("new artifact must be either a directory"
+                                               + " or a jar (or a zip kind of archive) file");
         }
         Reporter reporter = this.getReporter();
-        if (reporter == null) {
+        if (reporter == null)
+        {
             // if reporter is not defined just stub it...
-            reporter = new Reporter() {
+            reporter = new Reporter()
+            {
                 @Override
-                public void report(Report report) { }
+                public void report(Report report)
+                {}
             };
         }
+
+        prepareCheckMinorVersionIncreaseRule();
+
         ClassDataLoader referenceDataLoader = classDataLoaderFactory.createClassDataLoader();
         reporter.report(new Report(Severity.INFO, "Reading reference artifact: " + reference));
         referenceDataLoader.read(reference.toURI());
-        for (File file : this.referenceClasspath) {
-            try {
+        for (File file : this.referenceClasspath)
+        {
+            try
+            {
                 reporter.report(new Report(Severity.INFO, "Reading reference dependency: " + file));
                 referenceDataLoader.read(file.toURI());
-            } catch (ReadClassException e){
-                if (this.shouldWarnOnDependencyLoadingError()) {
+            }
+            catch (ReadClassException e)
+            {
+                if (this.shouldWarnOnDependencyLoadingError())
+                {
                     reporter.report(new Report(Severity.WARNING, e.getMessage()));
-                } else {
+                }
+                else
+                {
                     throw e;
                 }
             }
         }
-        List<ClassData> referenceData = referenceDataLoader.getClasses(reference.toURI(), includes, excludes);
+        Map<String, ClassData> referenceData = referenceDataLoader.getClasses(reference.toURI(),
+                                                                              includes,
+                                                                              excludes);
         ClassDataLoader newArtifactDataLoader = classDataLoaderFactory.createClassDataLoader();
         reporter.report(new Report(Severity.INFO, "Reading artifact: " + newArtifact));
         newArtifactDataLoader.read(newArtifact.toURI());
-        for (File file : this.newArtifactClasspath) {
-            try {
+        for (File file : this.newArtifactClasspath)
+        {
+            try
+            {
                 reporter.report(new Report(Severity.INFO, "Reading dependency: " + file));
                 newArtifactDataLoader.read(file.toURI());
-            } catch (ReadClassException e){
-                if (this.shouldWarnOnDependencyLoadingError()) {
+            }
+            catch (ReadClassException e)
+            {
+                if (this.shouldWarnOnDependencyLoadingError())
+                {
                     reporter.report(new Report(Severity.WARNING, e.getMessage()));
-                } else {
+                }
+                else
+                {
                     throw e;
                 }
             }
         }
-        List<ClassData> newData = newArtifactDataLoader.getClasses(newArtifact.toURI(), includes, excludes);
-        for (ClassData clazz : referenceData) {
-            boolean found = false;
-            for (ClassData newClazz : newData) {
-                if (clazz.isSame(newClazz)) {
-                    for (Rule rule : rules) {
-                        rule.checkBackwardCompatibility(reporter, clazz, newClazz);
-                    }
-                    newClazz.checkBackwardCompatibility(reporter, clazz, rules);
-                    found = true;
-                    break;
+
+        Map<String, ClassData> newData = newArtifactDataLoader.getClasses(newArtifact.toURI(),
+                                                                          includes,
+                                                                          excludes);
+        for (ClassData clazz : referenceData.values())
+        {
+            ClassData newClazz = newData.get(clazz.getName());
+            if (newClazz == null)
+            {
+                if (clazz.getVisibility() == Scope.PUBLIC)
+                {
+                    reporter.report(new Report(Severity.ERROR, "Public class " + clazz.getName()
+                                                               + " has been removed.", clazz, null));
                 }
+
+                continue;
             }
-            if (!found && clazz.getVisibility() == Scope.PUBLIC) {
-                reporter.report(new Report(Severity.ERROR, "Public class " + clazz.getName() + " has been removed.", clazz, null));
+
+            if (checkOnlyWatched && !newClazz.isJAPIWatched())
+            {
+                continue;
+            }
+
+            for (Rule rule : rules)
+            {
+                rule.checkBackwardCompatibility(reporter, clazz, newClazz);
+            }
+
+            newClazz.checkBackwardCompatibility(reporter, clazz, rules);
+        }
+
+        if (cmvinRule != null)
+        {
+            if (!cmvinRule.isVersionIncreaseNecessary() && isNewMinorVersion)
+            {
+                reporter.report(new Report(Severity.ERROR,
+                                           "You have increased the minor version, but no public method/field changes were detected. Please increase only the micro version in this case!"));
             }
         }
     }
-    
-   /**
-     * Defines if the checker should just warn on dependency loading error via the reporter,
-     *  or simply fails.
+
+
+    /**
+     * Defines if the checker should just warn on dependency loading error via the reporter, or simply fails.
+     *
      * @param warnOnDependencyLoadingError
      */
-    public void setWarnOnDependencyLoadingError(boolean warnOnDependencyLoadingError) {
+    public void setWarnOnDependencyLoadingError(boolean warnOnDependencyLoadingError)
+    {
         this.warnOnDependencyLoadingError = warnOnDependencyLoadingError;
     }
-    
+
+
     /**
-     * 
      * @return
      */
-    public boolean shouldWarnOnDependencyLoadingError() {
+    public boolean shouldWarnOnDependencyLoadingError()
+    {
         return this.warnOnDependencyLoadingError;
     }
 
+
+    public void setNewMinorVersion(boolean isNewMinorVersion)
+    {
+        this.isNewMinorVersion = isNewMinorVersion;
+    }
+
+
+    private void prepareCheckMinorVersionIncreaseRule()
+    {
+        for (Rule r : rules)
+        {
+            if (r instanceof AllRules)
+            {
+                for (Rule rr : ((AllRules)r).getRules())
+                {
+                    if (rr instanceof CheckMinorVersionIncreaseNeeded)
+                    {
+                        ((CheckMinorVersionIncreaseNeeded)rr).setMinorVersionIncreased(isNewMinorVersion);
+                        cmvinRule = (CheckMinorVersionIncreaseNeeded)rr;
+                        break;
+                    }
+                }
+            }
+            else if (r instanceof CheckMinorVersionIncreaseNeeded)
+            {
+                ((CheckMinorVersionIncreaseNeeded)r).setMinorVersionIncreased(isNewMinorVersion);
+                cmvinRule = (CheckMinorVersionIncreaseNeeded)r;
+                break;
+            }
+        }
+    }
 }

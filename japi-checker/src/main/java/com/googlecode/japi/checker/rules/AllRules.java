@@ -25,7 +25,7 @@ import com.googlecode.japi.checker.model.JavaItem;
 public class AllRules implements Rule {
 
     private List<Rule> rules = new ArrayList<Rule>();
-    
+
     public AllRules() {
         rules.add(new CheckChangeOfScope());
         rules.add(new CheckClassVersion());
@@ -41,8 +41,9 @@ public class AllRules implements Rule {
         rules.add(new CheckMethodChangedToFinal());
         rules.add(new InterfaceChangedToClass());
         rules.add(new CheckSuperClass());
+        rules.add(new CheckMinorVersionIncreaseNeeded());
     }
-    
+
     @Override
     public void checkBackwardCompatibility(Reporter reporter,
             JavaItem reference, JavaItem newItem) {
@@ -50,5 +51,11 @@ public class AllRules implements Rule {
             rule.checkBackwardCompatibility(reporter, reference, newItem);
         }
     }
-    
+
+
+    public List<Rule> getRules()
+    {
+        return rules;
+    }
+
 }

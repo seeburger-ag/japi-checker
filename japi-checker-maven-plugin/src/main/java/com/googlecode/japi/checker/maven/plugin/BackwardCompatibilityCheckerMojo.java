@@ -71,17 +71,16 @@ public class BackwardCompatibilityCheckerMojo
      * @readonly
      */
     private Artifact artifact;
-    
+
     /**
      * @parameter
      * @required
      */
     private List<String> rules;
-    
+
     /**
      * Reference version
      * @parameter
-     * @required
      */
     private ArtifactItem reference;
 
@@ -100,7 +99,7 @@ public class BackwardCompatibilityCheckerMojo
      * @reauired
      */
     private ArtifactFactory factory;
-    
+
     /**
      * Used to look up Artifacts in the remote repository.
      *
@@ -113,7 +112,7 @@ public class BackwardCompatibilityCheckerMojo
     /**
      * ArtifactRepository of the localRepository. To obtain the directory of localRepository in unit tests use
      * System.setProperty( "localRepository").
-     * 
+     *
      * @parameter expression="${localRepository}"
      * @required
      * @readonly
@@ -128,7 +127,7 @@ public class BackwardCompatibilityCheckerMojo
      * @required
      */
     protected List<ArtifactRepository> remoteRepos;
-        
+
     /**
      * The artifact collector to use.
      *
@@ -145,13 +144,20 @@ public class BackwardCompatibilityCheckerMojo
      * @readonly
      */
      protected ArtifactMetadataSource artifactMetadataSource;
-     
+
+     /**
+      * @parameter
+      */
+     protected boolean checkOnlyWatched;
+
+     private boolean isNewMinorVersion;
+
      /**
       *
       * @component
       */
-     private MavenProjectBuilder projectBuilder;    
-    
+     private MavenProjectBuilder projectBuilder;
+
     /**
      * {@inheritDoc}
      */
@@ -159,9 +165,24 @@ public class BackwardCompatibilityCheckerMojo
         if (artifact == null) {
             throw new MojoExecutionException("Artifact is null.");
         }
-        
+
         if (artifact.getFile() != null && artifact.getFile().exists()) {
-            
+
+            String artifactVersion = artifact.getVersion();
+            if (reference == null)
+            {
+                reference = new ArtifactItem();
+                reference.setArtifactId(artifact.getArtifactId());
+                reference.setGroupId(artifact.getGroupId());
+                reference.setVersion(getReferenceVersion(artifactVersion));
+                reference.setType(artifact.getType());
+            }
+
+            if (artifactVersion.substring(0, artifactVersion.indexOf("-")).endsWith(".0"))
+            {
+                isNewMinorVersion = true;
+            }
+
             // Retrieving the reference artifact.
             updateArtifact(reference);
             Artifact referenceArtifact = reference.getArtifact();
@@ -169,7 +190,7 @@ public class BackwardCompatibilityCheckerMojo
             try {
                 // Creating a new checker which compare the generated artifact against the provided reference.
                 BCChecker checker = new BCChecker();
-                
+
                 for (Artifact artifact : ((List<Artifact>)project.getCompileArtifacts())) {
                     this.getLog().debug("Adding new artifact dependency: " + artifact.getFile().toString());
                     checker.addToNewArtifactClasspath(artifact.getFile());
@@ -178,18 +199,20 @@ public class BackwardCompatibilityCheckerMojo
                     this.getLog().debug("Adding reference dependency: " + artifact.getFile().toString());
                     checker.addToReferenceClasspath(artifact.getFile());
                 }
-                
-                
+
+
                 // configuring the reporting redirection
                 MuxReporter mux = new MuxReporter();
                 mux.add(new LogReporter(this.getLog()));
                 SeverityCountReporter ec = new SeverityCountReporter();
                 mux.add(ec);
-            
+
                 // Running the check...
                 this.getLog().info("Checking backward compatibility of " + artifact.toString() + " against " + referenceArtifact.toString());
                 checker.setReporter(mux);
                 checker.setRules(getRuleInstances());
+                checker.setCheckOnlyWatched(checkOnlyWatched);
+                checker.setNewMinorVersion(isNewMinorVersion);
                 checker.checkBacwardCompatibility(referenceArtifact.getFile(), artifact.getFile());
                 if (ec.hasSeverity()) {
                     getLog().error("You have " + ec.getCount() + " backward compatibility issues.");
@@ -205,9 +228,40 @@ public class BackwardCompatibilityCheckerMojo
         } else {
             throw new MojoExecutionException("Could not find the artifact: " + artifact.toString());
         }
-        
+
     }
-    
+
+    private String getReferenceVersion(String version) throws MojoFailureException
+    {
+        String refVersion = version;
+        if (refVersion.contains("SNAPSHOT"))
+        {
+            refVersion = refVersion.substring(0, refVersion.lastIndexOf("-"));
+        }
+
+        String[] versions = refVersion.split("\\.");
+        if (versions.length != 3)
+        {
+            throw new MojoFailureException("Your version " + version + " does not match Maven versioning conventions!");
+        }
+
+        if (versions[2].equals("0"))
+        {
+            int minorVersion = Integer.valueOf(versions[1]);
+            minorVersion--;
+            versions[1] = String.valueOf(minorVersion);
+        }
+        else
+        {
+            int microVersion = Integer.valueOf(versions[2]);
+            microVersion--;
+            versions[2] = String.valueOf(microVersion);
+        }
+
+        return versions[0] + "." + versions[1] + "." + versions[2];
+    }
+
+
     protected List<Artifact> getDependencyList(String groupId, String artifactId, String version) throws MojoExecutionException {
         try {
             RuntimeDependencyResolver resolver = new RuntimeDependencyResolver(factory, this.resolver, artifactMetadataSource, localRepository, remoteRepos);
@@ -223,7 +277,7 @@ public class BackwardCompatibilityCheckerMojo
             throw new MojoExecutionException("Cannot solve reference artifact: ", e);
         } catch (InvalidDependencyVersionException e) {
             throw new MojoExecutionException("Cannot solve reference artifact: ", e);
-        }        
+        }
     }
 
     private List<Rule> getRuleInstances() throws MojoExecutionException {
@@ -240,11 +294,11 @@ public class BackwardCompatibilityCheckerMojo
             } catch (IllegalAccessException e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
-            
+
         }
         return rules;
     }
-    
+
     /**
      * @return Returns the factory.
      */
@@ -276,26 +330,26 @@ public class BackwardCompatibilityCheckerMojo
     public ArtifactRepository getLocalRepository() {
         return localRepository;
     }
-    
+
     public void setLocalRepository(ArtifactRepository localRepository) {
         this.localRepository = localRepository;
     }
-    
+
     /**
      * Resolves the Artifact from the remote repository if necessary. If no version is specified, it will be retrieved
      * from the dependency list or from the DependencyManagement section of the pom.
-     * 
+     *
      * @param artifactItem containing information about artifact from plugin configuration.
      * @return Artifact object representing the specified file.
      * @throws MojoExecutionException with a message if the version can't be found in DependencyManagement.
      */
     protected void updateArtifact(ArtifactItem artifactItem)
         throws MojoExecutionException {
-        
+
         if (artifactItem.getArtifact() != null) {
             return;
         }
-        
+
 
         VersionRange vr;
         try {
