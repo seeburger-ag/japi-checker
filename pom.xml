@@ -70,9 +70,9 @@
     </distributionManagement>
     
     <scm>
-    	<connection>scm:hg:https://code.google.com/p/japi-checker</connection>
-    	<developerConnection>scm:hg:https://code.google.com/p/japi-checker</developerConnection>
-    	<url>https://code.google.com/p/japi-checker</url>
+        <connection>scm:git:git@github.com:seeburger-ag/japi-checker.git</connection>
+        <developerConnection>scm:git:git@github.com:seeburger-ag/japi-checker.git</developerConnection>
+        <url>https://github.com/seeburger-ag/japi-checker</url>
     </scm>
     <build>
         <plugins>
