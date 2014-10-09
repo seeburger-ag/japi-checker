@@ -214,8 +214,16 @@ public class ClassData extends JavaItem {
     }
 
 
-    public boolean isJAPIWatched()
+    public String getPackage()
     {
-        return getAnnotation("Lcom/googlecode/japi/checker/WatchedByJAPI;") != null;
+        String n = getName().replaceAll("/", ".");
+        if (n.contains("."))
+        {
+            return n.substring(0, n.lastIndexOf("."));
+        }
+        else
+        {
+            return "";
+        }
     }
 }

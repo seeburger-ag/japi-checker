@@ -22,12 +22,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.googlecode.japi.checker.Reporter.Report;
 import com.googlecode.japi.checker.model.ClassData;
 import com.googlecode.japi.checker.rules.AllRules;
 import com.googlecode.japi.checker.rules.CheckMinorVersionIncreaseNeeded;
 import com.googlecode.japi.checker.utils.AntPatternMatcher;
+import com.googlecode.japi.checker.utils.PackageTreeNode;
 
 
 /**
@@ -46,9 +48,9 @@ public class BCChecker
     private boolean warnOnDependencyLoadingError;
     private Reporter reporter;
     private List<Rule> rules = Collections.emptyList();
-    private boolean checkOnlyWatched = false;
     private boolean isNewMinorVersion = false;
     private CheckMinorVersionIncreaseNeeded cmvinRule;
+    private String excludedPackages;
 
 
     /**
@@ -134,9 +136,9 @@ public class BCChecker
     }
 
 
-    public void setCheckOnlyWatched(boolean arg)
+    public void setExcludedPackages(String excludedPackages)
     {
-        this.checkOnlyWatched = arg;
+        this.excludedPackages = excludedPackages;
     }
 
 
@@ -230,11 +232,35 @@ public class BCChecker
             }
         }
 
+        PackageTreeNode rootNode = new PackageTreeNode("root", false);
+        if (excludedPackages != null)
+        {
+            String[] excPackages = excludedPackages.split(",");
+            for (String s : excPackages)
+            {
+                s = s.trim();
+                if (s.startsWith("!"))
+                {
+                    rootNode.addChildren(s, false);
+                }
+                else
+                {
+                    rootNode.addChildren(s, true);
+                }
+            }
+        }
+
         Map<String, ClassData> newData = newArtifactDataLoader.getClasses(newArtifact.toURI(),
                                                                           includes,
                                                                           excludes);
         for (ClassData clazz : referenceData.values())
         {
+            boolean isExcluded = rootNode.shouldExclude(clazz.getPackage());
+            if (isExcluded)
+            {
+                continue;
+            }
+
             ClassData newClazz = newData.get(clazz.getName());
             if (newClazz == null)
             {
@@ -244,11 +270,6 @@ public class BCChecker
                                                                + " has been removed.", clazz, null));
                 }
 
-                continue;
-            }
-
-            if (checkOnlyWatched && !newClazz.isJAPIWatched())
-            {
                 continue;
             }
 
@@ -267,6 +288,21 @@ public class BCChecker
                 reporter.report(new Report(Severity.ERROR,
                                            "You have increased the minor version, but no public method/field changes were detected. Please increase only the micro version in this case!"));
             }
+
+            if (!isNewMinorVersion)
+            {
+                Set<String> newDataClasses = newData.keySet();
+                Set<String> oldDataClasses = referenceData.keySet();
+
+                newDataClasses.removeAll(oldDataClasses);
+                for (String s : newDataClasses)
+                {
+                    if (!rootNode.shouldExclude(s))
+                    {
+                        reporter.report(new Report(Severity.ERROR, "You need to increase the minor version because you have added a new class : " + s + "!"));
+                    }
+                } // each of those classes has been added - we need to check if a minor versio
+            } // check if the minor version has to be increased because of newly added classes.
         }
     }
 

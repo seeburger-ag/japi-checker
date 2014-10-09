@@ -148,7 +148,7 @@ public class BackwardCompatibilityCheckerMojo
      /**
       * @parameter
       */
-     protected boolean checkOnlyWatched;
+     protected String excludedPackages;
 
      private boolean isNewMinorVersion;
 
@@ -211,7 +211,7 @@ public class BackwardCompatibilityCheckerMojo
                 this.getLog().info("Checking backward compatibility of " + artifact.toString() + " against " + referenceArtifact.toString());
                 checker.setReporter(mux);
                 checker.setRules(getRuleInstances());
-                checker.setCheckOnlyWatched(checkOnlyWatched);
+                checker.setExcludedPackages(excludedPackages);
                 checker.setNewMinorVersion(isNewMinorVersion);
                 checker.checkBacwardCompatibility(referenceArtifact.getFile(), artifact.getFile());
                 if (ec.hasSeverity()) {
