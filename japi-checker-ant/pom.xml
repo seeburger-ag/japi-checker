@@ -17,7 +17,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>japi-checker-pom</artifactId>
-		<groupId>com.googlecode.japi-checker</groupId>
+		<groupId>com.seeburger.fork.japi-checker</groupId>
 		<version>0.2.1.SEE1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
@@ -46,18 +46,18 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.googlecode.japi-checker</groupId>
+			<groupId>com.seeburger.fork.japi-checker</groupId>
 			<artifactId>japi-checker</artifactId>
 			<version>0.2.1.SEE1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>com.googlecode.japi-checker</groupId>
+			<groupId>com.seeburger.fork.japi-checker</groupId>
 			<artifactId>reference-test-jar</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.googlecode.japi-checker</groupId>
+			<groupId>com.seeburger.fork.japi-checker</groupId>
 			<artifactId>new-test-jar</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -101,8 +101,8 @@
 							<target unless="skipTests">
 								<echo>Running antunit test...</echo>
 								<echoproperties />
-								<echo>${com.googlecode.japi-checker:reference-test-jar:jar}</echo>
-								<echo>${com.googlecode.japi-checker:new-test-jar:jar}</echo>
+								<echo>${com.seeburger.fork.japi-checker:reference-test-jar:jar}</echo>
+								<echo>${com.seeburger.fork.japi-checker:new-test-jar:jar}</echo>
 								<echo>${com.google.code.findbugs:annotations:jar}</echo>
 								<property name="maven.project.version" value="${project.version}" />
 								<ant antfile="src/test/ant/build.xml" target="test" inheritRefs="true" />
