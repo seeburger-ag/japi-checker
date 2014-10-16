@@ -54,12 +54,12 @@
 
     <distributionManagement>
         <repository>
-            <id>sonatype-nexus</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <id>see</id>
+            <url>https://repo.seeburger.de/archiva/repository/release/</url>
         </repository>
         <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>see-snapshots</id>
+            <url>https://repo.seeburger.de/archiva/repository/snapshot/</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
         <site>
@@ -73,6 +73,7 @@
         <developerConnection>scm:git:git@github.com:seeburger-ag/japi-checker.git</developerConnection>
         <url>https://github.com/seeburger-ag/japi-checker</url>
     </scm>
+
     <build>
         <plugins>
             <plugin>
