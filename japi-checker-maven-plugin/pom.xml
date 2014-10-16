@@ -43,11 +43,11 @@
     </developers>
     <distributionManagement>
         <repository>
-            <id>see</id>
+            <id>release</id>
             <url>https://repo.seeburger.de/archiva/repository/release/</url>
         </repository>
         <snapshotRepository>
-            <id>see-snapshots</id>
+            <id>snapshot</id>
             <url>https://repo.seeburger.de/archiva/repository/snapshot/</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
