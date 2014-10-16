@@ -4,7 +4,7 @@
 	<taskdef uri="antlib:com.googlecode.japi.checker.ant"
              resource="com/googlecode/japi/checker/ant/antlib.xml"
              classpathref="maven.runtime.classpath" />
-  
+
 
 	<target name="test-missing-referenceFile-attribute">
 		<au:expectfailure expectedMessage="The 'referenceFile' attribute is not defined.">
@@ -22,7 +22,7 @@
 		<japi:checker referenceFile="${reference.jar.file}"
 				    file="${reference.jar.file}" />
 	</target>
-	
+
 	<target name="test-check-with-reference-and-new-file">
 		<au:expectfailure expectedMessage="You have 5 backward compatibility issues.">
 			<japi:checker referenceFile="${reference.jar.file}"
@@ -45,7 +45,7 @@
 	</target>
 
 	<target name="test-check-with-reference-and-new-file-with-classpath-and-rules">
-		<au:expectfailure expectedMessage="You have 63 backward compatibility issues.">
+		<au:expectfailure expectedMessage="You have 73 backward compatibility issues.">
 			<japi:checker referenceFile="${reference.jar.file}"
 				    file="${new.jar.file}">
 				<classpath>
