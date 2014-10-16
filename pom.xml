@@ -15,20 +15,24 @@
  limitations under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.seeburger.fork.japi-checker</groupId>
-	<artifactId>japi-checker-pom</artifactId>
-	<name>JAPI Checker POM</name>
-	<version>0.2.1.SEE1-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.seeburger.fork.japi-checker</groupId>
+    <artifactId>japi-checker-pom</artifactId>
+    <name>JAPI Checker POM</name>
+    <version>0.2.1.SEE1-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <licenses>
         <license>
             <name>Apache License 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
+
     <description>Top level POM file for the JAPI Checker project.</description>
     <url>http://japi-checker.googlecode.com</url>
+
     <inceptionYear>2011</inceptionYear>
     <developers>
         <developer>
@@ -38,9 +42,9 @@
             <name>William Bernardet</name>
         </developer>
         <developer>
-        	<name>Tomas Rohovsky</name>
-        	<id>trohovsky</id>
-        	<url>https://github.com/trohovsky</url>
+            <name>Tomas Rohovsky</name>
+            <id>trohovsky</id>
+            <url>https://github.com/trohovsky</url>
         </developer>
     </developers>
 
@@ -51,6 +55,11 @@
         <module>japi-checker-maven-plugin</module>
         <module>japi-checker-ant</module>
     </modules>
+
+    <properties>
+        <distribution.site.id>dedcbuild01</distribution.site.id>
+        <distribution.site.url>scp://dedcbuild01/srv/www-build/sites/${project.groupId}/${project.artifactId}</distribution.site.url>
+    </properties>
 
     <distributionManagement>
         <repository>
@@ -63,8 +72,8 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
         <site>
-            <id>stub-for-stage</id>
-            <url>file://tmp/site-deploy/japi-checker</url>
+            <id>${distribution.site.id}</id>
+            <url>${distribution.site.url}</url>
         </site>
     </distributionManagement>
 
@@ -179,6 +188,15 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <!-- extension to use ssh/scp for site deployment -->
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.4</version>
+            </extension>
+        </extensions>
     </build>
 
 
