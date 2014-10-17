@@ -31,14 +31,14 @@ import com.googlecode.japi.checker.Rule;
 import com.googlecode.japi.checker.SeverityCountReporter;
 
 public class BytecodeBackwardCompatibilityCheckerTask extends Task {
-	
+
 	private File referenceFile;
 	private File file;
 	private boolean failOnError = true;
 	private List<Path> classpaths = new ArrayList<Path>();
 	private List<Path> referenceClasspaths = new ArrayList<Path>();
 	private List<RuleSet> ruleSets = new ArrayList<RuleSet>();
-			
+
 	public File getReferenceFile() {
 		return referenceFile;
 	}
@@ -74,7 +74,7 @@ public class BytecodeBackwardCompatibilityCheckerTask extends Task {
 	public void add(RuleSet ruleSet) {
 		ruleSets.add(ruleSet);
 	}
-	
+
 	public void execute() {
 		if (getReferenceFile() == null) {
 			throw new BuildException("The 'referenceFile' attribute is not defined.");
@@ -82,16 +82,17 @@ public class BytecodeBackwardCompatibilityCheckerTask extends Task {
 		if (getFile() == null) {
 			throw new BuildException("The 'file' attribute is not defined.");
 		}
+		log("Target: " + getOwningTarget());
 		log("Checking " + getFile().getAbsolutePath() + " backward compatibility against " + getReferenceFile().getAbsolutePath());
 		try {
 			BCChecker checker = new BCChecker();
-            
+
 			// Configuring the reporting
 			MuxReporter mux = new MuxReporter();
             mux.add(new AntReporter(this));
             SeverityCountReporter ec = new SeverityCountReporter();
             mux.add(ec);
-            
+
             // Setting up the classpaths for the reference and new version.
             for (Path path : this.referenceClasspaths) {
             	for (String filename : path.list()) {
@@ -103,7 +104,7 @@ public class BytecodeBackwardCompatibilityCheckerTask extends Task {
             		checker.addToNewArtifactClasspath(new File(filename));
             	}
             }
-            
+
             // Load rules
             List<Rule> rules = new ArrayList<Rule>();
             for (RuleSet ruleSet : ruleSets) {
@@ -119,14 +120,14 @@ public class BytecodeBackwardCompatibilityCheckerTask extends Task {
                     } catch (IllegalAccessException e) {
                         throw new BuildException(e.getMessage(), e);
                     }
-            		
+
             	}
             }
             // Running the check...
             checker.setReporter(mux);
             checker.setRules(rules);
 			checker.checkBacwardCompatibility(getReferenceFile(), getFile());
-			
+
 			// Summary, failing ant in case of error...
             if (ec.hasSeverity()) {
                 log("You have " + ec.getCount() + " backward compatibility issues.", Project.MSG_ERR);
