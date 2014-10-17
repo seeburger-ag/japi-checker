@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>japi-checker-pom</artifactId>
-    <groupId>com.googlecode.japi-checker</groupId>
+    <groupId>com.seeburger.fork.japi-checker</groupId>
     <version>0.2.1.SEE1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -62,13 +62,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.japi-checker</groupId>
+      <groupId>com.seeburger.fork.japi-checker</groupId>
       <artifactId>reference-test-jar</artifactId>
       <version>0.2.1.SEE1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.japi-checker</groupId>
+      <groupId>com.seeburger.fork.japi-checker</groupId>
       <artifactId>new-test-jar</artifactId>
       <version>0.2.1.SEE1-SNAPSHOT</version>
       <scope>test</scope>

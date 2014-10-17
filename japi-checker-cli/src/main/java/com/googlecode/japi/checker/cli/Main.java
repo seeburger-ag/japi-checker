@@ -42,10 +42,10 @@ import com.googlecode.japi.checker.rules.AllRules;
 import com.googlecode.japi.checker.rules.CheckMethodVariableArity;
 
 /**
- * 
+ *
  * @author Tomas Rohovsky
  * @author William Bernardet
- * 
+ *
  */
 public class Main {
     private static final String HELP_CMDLINE = "japi-checker-cli [-bin] [-cp <arg>] [-h] [-rcp <arg>] REFERENCE_LIBRARY NEW_LIBRARY";
@@ -66,7 +66,7 @@ public class Main {
                 .getClass()
                 .getClassLoader()
                 .getResourceAsStream(
-                        "META-INF/maven/com.googlecode.japi-checker/japi-checker-cli/pom.properties");
+                        "META-INF/maven/com.seeburger.fork.japi-checker/japi-checker-cli/pom.properties");
         if (is != null) {
             try {
                 Properties properties = new Properties();
