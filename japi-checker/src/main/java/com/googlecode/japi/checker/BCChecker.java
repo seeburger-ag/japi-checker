@@ -255,6 +255,11 @@ public class BCChecker
                                                                           excludes);
         for (ClassData clazz : referenceData.values())
         {
+            if (clazz.getVisibility() != Scope.PUBLIC)
+            {
+                continue;
+            } // we care only about public classes.
+
             boolean isExcluded = rootNode.shouldExclude(clazz.getPackage());
             if (isExcluded)
             {
@@ -264,12 +269,8 @@ public class BCChecker
             ClassData newClazz = newData.get(clazz.getName());
             if (newClazz == null)
             {
-                if (clazz.getVisibility() == Scope.PUBLIC)
-                {
-                    reporter.report(new Report(Severity.ERROR, "Public class " + clazz.getName()
-                                                               + " has been removed.", clazz, null));
-                }
-
+                reporter.report(new Report(Severity.ERROR, "Public class " + clazz.getName()
+                                                           + " has been removed.", clazz, null));
                 continue;
             }
 
@@ -299,7 +300,9 @@ public class BCChecker
                 {
                     if (!rootNode.shouldExclude(s))
                     {
-                        reporter.report(new Report(Severity.ERROR, "You need to increase the minor version because you have added a new class : " + s + "!"));
+                        reporter.report(new Report(Severity.ERROR,
+                                                   "You need to increase the minor version because you have added a new class : "
+                                                                   + s + "!"));
                     }
                 } // each of those classes has been added - we need to check if a minor versio
             } // check if the minor version has to be increased because of newly added classes.
