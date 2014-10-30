@@ -178,10 +178,21 @@ public class BackwardCompatibilityCheckerMojo
                 reference.setType(artifact.getType());
             }
 
-            if (artifactVersion.substring(0, artifactVersion.indexOf("-")).endsWith(".0"))
+            if (artifactVersion.contains("-SNAPSHOT"))
             {
-                isNewMinorVersion = true;
-            }
+                if (artifactVersion.substring(0, artifactVersion.indexOf('-')).endsWith(".0"))
+                {
+                    isNewMinorVersion = true;
+                }
+            } // it's a snapshot
+            else
+            {
+                if (artifactVersion.endsWith(".0"))
+                {
+                    isNewMinorVersion = true;
+                }
+            } // release version
+
 
             // Retrieving the reference artifact.
             updateArtifact(reference);
