@@ -17,7 +17,7 @@
 	<parent>
 		<artifactId>japi-checker-pom</artifactId>
 		<groupId>com.seeburger.fork.japi-checker</groupId>
-		<version>0.2.1.SEE5-SNAPSHOT</version>
+		<version>0.2.1.SEE5</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
