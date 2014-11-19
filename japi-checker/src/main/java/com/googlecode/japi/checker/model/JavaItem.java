@@ -293,13 +293,7 @@ public abstract class JavaItem
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
-        result = prime * result + (isAbstract ? 1231 : 1237);
-        result = prime * result + (isFinal ? 1231 : 1237);
-        result = prime * result + (isInterface ? 1231 : 1237);
         result = prime * result + (isStatic ? 1231 : 1237);
-        result = prime * result + (isTransient ? 1231 : 1237);
-        result = prime * result + (isVariableArity ? 1231 : 1237);
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((visibility == null) ? 0 : visibility.hashCode());
         return result;
@@ -316,24 +310,7 @@ public abstract class JavaItem
         if (getClass() != obj.getClass())
             return false;
         JavaItem other = (JavaItem)obj;
-        if (annotations == null)
-        {
-            if (other.annotations != null)
-                return false;
-        }
-        else if (!annotations.equals(other.annotations))
-            return false;
-        if (isAbstract != other.isAbstract)
-            return false;
-        if (isFinal != other.isFinal)
-            return false;
-        if (isInterface != other.isInterface)
-            return false;
         if (isStatic != other.isStatic)
-            return false;
-        if (isTransient != other.isTransient)
-            return false;
-        if (isVariableArity != other.isVariableArity)
             return false;
         if (name == null)
         {
