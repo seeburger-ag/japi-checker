@@ -153,7 +153,7 @@ public class MethodData
     public int hashCode()
     {
         final int prime = 31;
-        int result = 1;
+        int result = super.hashCode();
         result = prime * result + ((descriptor == null) ? 0 : descriptor.hashCode());
         result = prime * result + ((exceptions == null) ? 0 : exceptions.hashCode());
         result = prime * result + ((signature == null) ? 0 : signature.hashCode());
@@ -166,7 +166,7 @@ public class MethodData
     {
         if (this == obj)
             return true;
-        if (obj == null)
+        if (!super.equals(obj))
             return false;
         if (getClass() != obj.getClass())
             return false;
@@ -194,5 +194,4 @@ public class MethodData
             return false;
         return true;
     }
-
 }

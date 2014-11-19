@@ -140,9 +140,10 @@ public class FieldData
     public int hashCode()
     {
         final int prime = 31;
-        int result = 1;
+        int result = super.hashCode();
         result = prime * result + ((descriptor == null) ? 0 : descriptor.hashCode());
         result = prime * result + ((signature == null) ? 0 : signature.hashCode());
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
         return result;
     }
 
@@ -152,7 +153,7 @@ public class FieldData
     {
         if (this == obj)
             return true;
-        if (obj == null)
+        if (!super.equals(obj))
             return false;
         if (getClass() != obj.getClass())
             return false;
@@ -171,7 +172,13 @@ public class FieldData
         }
         else if (!signature.equals(other.signature))
             return false;
+        if (value == null)
+        {
+            if (other.value != null)
+                return false;
+        }
+        else if (!value.equals(other.value))
+            return false;
         return true;
     }
-
 }
