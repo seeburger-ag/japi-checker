@@ -286,8 +286,14 @@ public class BCChecker
         {
             if (!cmvinRule.isVersionIncreaseNecessary() && isNewMinorVersion)
             {
-                reporter.report(new Report(Severity.ERROR,
-                                           "You have increased the minor version, but no public method/field changes were detected. Please increase only the micro version in this case!"));
+                Set<String> newDataClasses = newData.keySet();
+                Set<String> oldDataClasses = referenceData.keySet();
+                newDataClasses.removeAll(oldDataClasses);
+                if (newDataClasses.isEmpty())
+                {
+                    reporter.report(new Report(Severity.ERROR,
+                                    "You have increased the minor version, but no public method/field/class changes were detected. Please increase only the micro version in this case!"));
+                }
             }
 
             if (!isNewMinorVersion)
