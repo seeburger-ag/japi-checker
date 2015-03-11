@@ -41,10 +41,32 @@ public class CheckRemovedMethod implements Rule {
                     }
                 }
                 if (!found && oldMethod.getVisibility().isMoreVisibleThan(Scope.NO_SCOPE)) {
-                	reporter.report(new Report(Severity.ERROR, "Could not find " + oldMethod + " in newer version.", reference, newItem));
+                    ClassData superClass = newClass.getClassDataLoader().fromName(newClass.getSuperName());
+                    boolean foundInSuperclass = false;
+                    while (superClass != null)
+                    {
+                        for (MethodData smd : superClass.getMethods())
+                        {
+                            if (smd.isSame(oldMethod))
+                            {
+                                foundInSuperclass = true;
+                                break;
+                            }
+                        }
+
+                        if (foundInSuperclass)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (!foundInSuperclass)
+                    {
+                        reporter.report(new Report(Severity.ERROR, "Could not find " + oldMethod + " in newer version.", reference, newItem));
+                    }
                 }
             }
         }
     }
-    
+
 }
