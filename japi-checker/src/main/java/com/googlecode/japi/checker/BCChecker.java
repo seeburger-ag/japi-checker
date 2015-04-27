@@ -289,10 +289,21 @@ public class BCChecker
                 Set<String> newDataClasses = newData.keySet();
                 Set<String> oldDataClasses = referenceData.keySet();
                 newDataClasses.removeAll(oldDataClasses);
-                if (newDataClasses.isEmpty())
+                boolean foundNewPublicClass = false;
+                for (String newClassName : newDataClasses)
+                {
+                    ClassData cd = newData.get(newClassName);
+                    if (Scope.PUBLIC.equals(cd.getVisibility()))
+                    {
+                        foundNewPublicClass = true;
+                        break;
+                    }
+                }
+
+                if (!foundNewPublicClass)
                 {
                     reporter.report(new Report(Severity.ERROR,
-                                    "You have increased the minor version, but no public method/field/class changes were detected. Please increase only the micro version in this case!"));
+                                               "You have increased the minor version, but no public method/field/class changes were detected. Please increase only the micro version in this case!"));
                 }
             }
 
@@ -304,7 +315,7 @@ public class BCChecker
                 newDataClasses.removeAll(oldDataClasses);
                 for (String s : newDataClasses)
                 {
-                    if (!rootNode.shouldExclude(s))
+                    if (!rootNode.shouldExclude(s) && Scope.PUBLIC.equals(newData.get(s).getVisibility()))
                     {
                         reporter.report(new Report(Severity.ERROR,
                                                    "You need to increase the minor version because you have added a new class : "
