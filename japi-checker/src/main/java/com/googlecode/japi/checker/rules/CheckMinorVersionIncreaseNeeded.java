@@ -33,7 +33,7 @@ public class CheckMinorVersionIncreaseNeeded
     @Override
     public void checkBackwardCompatibility(Reporter reporter, JavaItem reference, JavaItem newItem)
     {
-        if (reference instanceof ClassData)
+        if (reference instanceof ClassData && Scope.PUBLIC.equals(reference.getVisibility()))
         {
             ClassData oldCD = (ClassData)reference;
             ClassData newCD = (ClassData)newItem;
