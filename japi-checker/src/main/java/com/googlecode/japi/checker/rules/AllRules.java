@@ -24,7 +24,7 @@ import com.googlecode.japi.checker.model.JavaItem;
 
 public class AllRules implements Rule {
 
-    private List<Rule> rules = new ArrayList<Rule>();
+    protected List<Rule> rules = new ArrayList<Rule>();
 
     public AllRules() {
         rules.add(new CheckChangeOfScope());
