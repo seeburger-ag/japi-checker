@@ -20,7 +20,7 @@
     <groupId>com.seeburger.fork.japi-checker</groupId>
     <artifactId>japi-checker-pom</artifactId>
     <name>JAPI Checker POM</name>
-    <version>0.2.1.SEE10-SNAPSHOT</version>
+    <version>0.2.1.SEE10</version>
     <packaging>pom</packaging>
 
     <licenses>
@@ -81,7 +81,7 @@
         <connection>scm:git:git@github.com:seeburger-ag/japi-checker.git</connection>
         <developerConnection>scm:git:git@github.com:seeburger-ag/japi-checker.git</developerConnection>
         <url>https://github.com/seeburger-ag/japi-checker</url>
-    <tag>HEAD</tag>
+    <tag>japi-checker-pom-0.2.1.SEE10</tag>
   </scm>
 
     <build>
