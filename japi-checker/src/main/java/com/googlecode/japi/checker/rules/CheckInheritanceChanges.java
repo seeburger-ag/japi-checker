@@ -24,23 +24,65 @@ import com.googlecode.japi.checker.model.JavaItem;
 
 public class CheckInheritanceChanges implements Rule {
 
+    private static final String JAVA_LANG_OBJECT_NAME = "java/lang/Object";
+
     @Override
     public void checkBackwardCompatibility(Reporter reporter,
             JavaItem reference, JavaItem newItem) {
         if (reference instanceof ClassData) {
             // Check extends...
-            if (!((ClassData) reference).getSuperName().equals(((ClassData) newItem).getSuperName())) {
+            if (!doesExtend((ClassData)newItem, ((ClassData) reference).getSuperName())) {
                 reporter.report(new Report(Severity.ERROR, reference.getName() + " extends " + ((ClassData) newItem).getSuperName() +
                         " and not " + ((ClassData) reference).getSuperName() + " anymore.", reference, newItem));
             }
             // Check interfaces
             for (String ifaceRef : ((ClassData) reference).getInterfaces()) {
-                if (!((ClassData) newItem).getInterfaces().contains(ifaceRef)) {
+                if (!hasInterface((ClassData)newItem, ifaceRef)) {
                     reporter.report(new Report(Severity.ERROR, reference.getName() + " is not implementing " + ifaceRef + " anymore.", reference, newItem));
                 }
             }
         }
-        
+    }
+
+
+    private boolean doesExtend(ClassData newItem, String superClassName)
+    {
+        if (newItem == null)
+        {
+            return false;
+        }
+        else if (newItem.getSuperName().equals(superClassName))
+        {
+            return true;
+        }
+        else if (!newItem.getSuperName().equals(JAVA_LANG_OBJECT_NAME))
+        {
+            return doesExtend(newItem.getClassDataLoader().fromName(newItem.getSuperName()), superClassName);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private boolean hasInterface(ClassData newItem, String ifaceRef)
+    {
+        if (newItem == null)
+        {
+            return false;
+        }
+        else if (newItem.getInterfaces().contains(ifaceRef))
+        {
+            return true;
+        }
+        else if (!newItem.getSuperName().equals(JAVA_LANG_OBJECT_NAME))
+        {
+            return hasInterface(newItem.getClassDataLoader().fromName(newItem.getSuperName()), ifaceRef);
+        }
+        else
+        {
+            return false;
+        }
     }
 
 }
