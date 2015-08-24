@@ -293,6 +293,12 @@ public class BCChecker
                 for (String newClassName : newDataClasses)
                 {
                     ClassData cd = newData.get(newClassName);
+                    boolean isExcluded = rootNode.shouldExclude(cd.getPackage());
+                    if (isExcluded)
+                    {
+                        continue;
+                    }
+
                     if (Scope.PUBLIC.equals(cd.getVisibility()))
                     {
                         foundNewPublicClass = true;
@@ -315,6 +321,12 @@ public class BCChecker
                 newDataClasses.removeAll(oldDataClasses);
                 for (String s : newDataClasses)
                 {
+                    boolean isExcluded = rootNode.shouldExclude(newData.get(s).getPackage());
+                    if (isExcluded)
+                    {
+                        continue;
+                    }
+
                     if (!rootNode.shouldExclude(s) && Scope.PUBLIC.equals(newData.get(s).getVisibility()))
                     {
                         reporter.report(new Report(Severity.ERROR,
