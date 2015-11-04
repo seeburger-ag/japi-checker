@@ -178,7 +178,12 @@ public class BackwardCompatibilityCheckerMojo
                 reference.setType(artifact.getType());
             }
 
-            if (artifactVersion.contains("-SNAPSHOT"))
+            if (artifactVersion.contains(".0.0"))
+            {
+               this.getLog().info("New major version detected - compatibility check will be skipped.");
+               return; // this is a new major version - nothing to check, return.
+            }
+            else if (artifactVersion.contains("-SNAPSHOT"))
             {
                 if (artifactVersion.substring(0, artifactVersion.indexOf('-')).endsWith(".0"))
                 {
@@ -192,6 +197,8 @@ public class BackwardCompatibilityCheckerMojo
                     isNewMinorVersion = true;
                 }
             } // release version
+
+
 
 
             // Retrieving the reference artifact.
